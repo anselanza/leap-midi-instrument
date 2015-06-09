@@ -50,6 +50,9 @@ output.openVirtualPort("Leap MIDI");
 output.getPortCount();
 console.log('found', output.getPortCount(), 'output ports');
 
+// Note On: 144, 64, 90
+// Note Off: 128, 64, 40
+
 var interval = setInterval(function() {
 	console.log('sending MIDI output...');
 	output.sendMessage([144,60,127]);
