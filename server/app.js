@@ -22,3 +22,36 @@ server.listen(config.port, config.ip, function () {
 
 // Expose app
 exports = module.exports = app;
+
+
+// var io = require('socket.io')(server);
+
+
+
+
+var midi = require('midi');
+
+// Set up a new input.
+// var input = new midi.input();
+
+// // Count the available input ports.
+// input.getPortCount();
+
+// // Get the name of a specified input port.
+// input.getPortName(0);
+
+// console.log("MIDI device on port 0: ", input.getPortName(0));
+
+// // Open the first available input port.
+// input.openPort(0);
+
+var output = new midi.output();
+output.openVirtualPort("Leap MIDI");
+output.getPortCount();
+console.log('found', output.getPortCount(), 'output ports');
+
+var interval = setInterval(function() {
+	console.log('sending MIDI output...');
+	output.sendMessage([144,60,127]);
+}, 1000);
+
