@@ -30,6 +30,7 @@ exports = module.exports = app;
 
 
 var midi = require('midi');
+var Leap = require('leapjs');
 
 // Set up a new input.
 // var input = new midi.input();
@@ -53,8 +54,37 @@ console.log('found', output.getPortCount(), 'output ports');
 // Note On: 144, 64, 90
 // Note Off: 128, 64, 40
 
-var interval = setInterval(function() {
-	console.log('sending MIDI output...');
-	output.sendMessage([144,60,127]);
-}, 1000);
+var controller = new Leap.Controller({
+      enableGestures: false
+});
+
+controller.on('connect', function() {
+  console.log("Leap Motion connected!");
+
+  setInterval(function(){
+	  var frame = controller.frame();
+	  var hand1 = frame.hands[0];
+	  var hand2 = frame.hands[1];
+
+
+      if (hand1) {
+        var actualHeight = hand1.palmPosition[1];
+	    var grabStrength = hand1.grabStrength;
+	    var rotation = hand1.roll();
+
+        console.log("actualHeight: ", actualHeight, "grabStrength: ", grabStrength, "rotation: ", rotation);
+      }
+
+
+  }, 50);
+
+
+});
+
+controller.connect();
+
+// var interval = setInterval(function() {
+// 	console.log('sending MIDI output...');
+// 	output.sendMessage([144,60,127]);
+// }, 1000);
 
