@@ -58,6 +58,28 @@ var controller = new Leap.Controller({
       enableGestures: false
 });
 
+var scaleArray = [
+	60,
+	62,
+	63,
+	65,
+	67
+];
+
+function map_range(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
+
+function constrain(value, min, max) {
+	if (value < min) {
+		value = min;
+	}
+	if (value > max) {
+		value = max;
+	}
+	return value;
+}
+
 controller.on('connect', function() {
   console.log("Leap Motion connected!");
 
@@ -72,7 +94,14 @@ controller.on('connect', function() {
 	    var grabStrength = hand1.grabStrength;
 	    var rotation = hand1.roll();
 
-        console.log("actualHeight: ", actualHeight, "grabStrength: ", grabStrength, "rotation: ", rotation);
+        var mappedHeight = Math.floor(map_range(actualHeight, 100, 400, 0, scaleArray.length));
+        mappedHeight = constrain(mappedHeight, 0, scaleArray.length-1);
+
+        // console.log("actualHeight: ", actualHeight, "grabStrength: ", grabStrength, "rotation: ", rotation);
+        console.log("actualHeight:", actualHeight, "mappedHeight:", mappedHeight);
+        console.log("note:", scaleArray[mappedHeight]);
+    	output.sendMessage([144,scaleArray[mappedHeight],100]);
+
       }
 
 
