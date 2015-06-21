@@ -61,7 +61,7 @@ var controller = new Leap.Controller({
 var scaleArray = [
 	60,
 	62,
-	63,
+	64,
 	65,
 	67
 ];
@@ -83,6 +83,8 @@ function constrain(value, min, max) {
 controller.on('connect', function() {
   console.log("Leap Motion connected!");
 
+  var previousNoteSelection = null;
+
   setInterval(function(){
 	  var frame = controller.frame();
 	  var hand1 = frame.hands[0];
@@ -98,9 +100,15 @@ controller.on('connect', function() {
         mappedHeight = constrain(mappedHeight, 0, scaleArray.length-1);
 
         // console.log("actualHeight: ", actualHeight, "grabStrength: ", grabStrength, "rotation: ", rotation);
-        console.log("actualHeight:", actualHeight, "mappedHeight:", mappedHeight);
-        console.log("note:", scaleArray[mappedHeight]);
-    	output.sendMessage([144,scaleArray[mappedHeight],100]);
+        // console.log("actualHeight:", actualHeight, "mappedHeight:", mappedHeight);
+        // console.log("note:", scaleArray[mappedHeight]);
+
+        if (mappedHeight !== previousNoteSelection) {
+        	console.log("new note:", scaleArray[mappedHeight]);
+        	previousNoteSelection = mappedHeight;
+	    	output.sendMessage([144,scaleArray[mappedHeight],100]);
+        }
+
 
       }
 
