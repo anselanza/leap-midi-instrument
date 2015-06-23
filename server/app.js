@@ -23,6 +23,7 @@ server.listen(config.port, config.ip, function () {
 // Expose app
 exports = module.exports = app;
 
+var scaleArray = [];
 
 // var io = require('socket.io')(server);
 
@@ -33,18 +34,31 @@ var midi = require('midi');
 var Leap = require('leapjs');
 
 // Set up a new input.
-// var input = new midi.input();
+var input = new midi.input();
 
-// // Count the available input ports.
-// input.getPortCount();
+// Count the available input ports...
+var numInputs = input.getPortCount();
+console.log('num inputs available:',numInputs);
 
-// // Get the name of a specified input port.
-// input.getPortName(0);
+for (var i=0; i<numInputs; i++) {
+  console.log('input #' + i + ': ' + input.getPortName(i));
+}
 
-// console.log("MIDI device on port 0: ", input.getPortName(0));
+// // Open a specific available input port...
+input.openPort(0);
 
-// // Open the first available input port.
-// input.openPort(0);
+input.on('message', function(deltaTime, message) {
+  console.log('m:' + message + ' d:' + deltaTime);
+  if (message[0] == 144) { // note down
+    var newNote = message[1];
+    console.log('Adding note:', newNote);
+    scaleArray.push(newNote);
+    console.log('scaleArray is now:', scaleArray);
+  }
+}); 
+
+
+
 
 var output = new midi.output();
 output.openVirtualPort("Leap MIDI");
@@ -58,13 +72,16 @@ var controller = new Leap.Controller({
       enableGestures: false
 });
 
-var scaleArray = [
-	60,
-	62,
-	64,
-	65,
-	67
-];
+// var scaleArray = [
+// 	60,
+// 	62,
+// 	64,
+// 	66,
+// 	68,
+// 	70
+
+// ];
+
 
 function map_range(value, low1, high1, low2, high2) {
     return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
@@ -81,7 +98,7 @@ function constrain(value, min, max) {
 }
 
 controller.on('connect', function() {
-  console.log("Leap Motion connected!");
+  console.log('Leap Motion connected!');
 
   var previousNoteSelection = null;
 
@@ -104,6 +121,7 @@ controller.on('connect', function() {
         // console.log("note:", scaleArray[mappedHeight]);
 
         if (mappedHeight !== previousNoteSelection) {
+        	output.sendMessage([128,scaleArray[previousNoteSelection],100]);
         	console.log("new note:", scaleArray[mappedHeight]);
         	previousNoteSelection = mappedHeight;
 	    	output.sendMessage([144,scaleArray[mappedHeight],100]);
