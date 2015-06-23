@@ -135,18 +135,15 @@ controller.on('connect', function() {
 
         if (mappedHeight !== previousNoteSelection) {
         	output.sendMessage([128,scaleArray[previousNoteSelection],100]);
-        	console.log("new note");
-          var graphLine1 = "";
-          var graphLine2 = "";
+          var graphLine = "";
           for (var i=0; i<scaleArray.length; i++) {
             if (i == mappedHeight) {
-              graphLine1 += "[-*-]";
+              graphLine += "[-*-]";
             } else {
-              graphLine1 += "[   ]";
+              graphLine += "[   ]";
             }
           }
-          console.log(graphLine1);
-          console.log(graphLine2);
+          console.log(graphLine);
           // console.log(scaleArray[mappedHeight]);
         	previousNoteSelection = mappedHeight;
 	    	  output.sendMessage([144,scaleArray[mappedHeight],100]);
