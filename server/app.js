@@ -134,7 +134,7 @@ controller.on('connect', function() {
         // console.log("note:", scaleArray[mappedHeight]);
 
         if (mappedHeight !== previousNoteSelection) {
-        	output.sendMessage([128,scaleArray[previousNoteSelection],100]);
+        	// output.sendMessage([128,scaleArray[previousNoteSelection],100]); // note off
           var graphLine = "";
           for (var i=0; i<scaleArray.length; i++) {
             if (i == mappedHeight) {
