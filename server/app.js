@@ -52,7 +52,7 @@ var record = false;
 
 input.on('message', function(deltaTime, message) {
   console.log('m:' + message + ' d:' + deltaTime);
-  if (message[0] == 176) { // control change
+  if (message[0] == 176 && message[1] == 20) { // control change
     if (message[2] == 127) {
       console.log('******** ready for record...');
       record = true;
@@ -80,6 +80,8 @@ console.log('found', output.getPortCount(), 'output ports');
 
 // Note On: 144, 64, 90
 // Note Off: 128, 64, 40
+// Control Change: 
+
 
 var controller = new Leap.Controller({
       enableGestures: false
@@ -133,6 +135,12 @@ controller.on('connect', function() {
         // console.log("actualHeight:", actualHeight, "mappedHeight:", mappedHeight);
         // console.log("note:", scaleArray[mappedHeight]);
 
+        var controlChange1 = [176, 7, Math.floor(map_range(grabStrength, 0, 1, 0, 127))];
+        output.sendMessage(controlChange1);
+
+        // var controlChange2 = [177, 8, Math.floor(map_range(g))]
+        // console.log(controlChange1);
+
         if (mappedHeight !== previousNoteSelection) {
         	// output.sendMessage([128,scaleArray[previousNoteSelection],100]); // note off
           var graphLine = "";
@@ -147,6 +155,10 @@ controller.on('connect', function() {
           // console.log(scaleArray[mappedHeight]);
         	previousNoteSelection = mappedHeight;
 	    	  output.sendMessage([144,scaleArray[mappedHeight],100]);
+        } else {
+          var controlChange1 = [176, 7, 127];
+          output.sendMessage(controlChange1);
+
         }
 
 
