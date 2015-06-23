@@ -47,9 +47,22 @@ for (var i=0; i<numInputs; i++) {
 // // Open a specific available input port...
 input.openPort(0);
 
+var record = false;
+
+
 input.on('message', function(deltaTime, message) {
   console.log('m:' + message + ' d:' + deltaTime);
-  if (message[0] == 144) { // note down
+  if (message[0] == 176) { // control change
+    if (message[2] == 127) {
+      console.log('******** ready for record...');
+      record = true;
+    } else {
+      record = false;
+      scaleArray = [];
+      console.log('******** clear scaleArray!');
+    }
+  }
+  if (message[0] == 144 && record) { // note down
     var newNote = message[1];
     console.log('Adding note:', newNote);
     scaleArray.push(newNote);
@@ -110,8 +123,8 @@ controller.on('connect', function() {
 
       if (hand1) {
         var actualHeight = hand1.palmPosition[1];
-	    var grabStrength = hand1.grabStrength;
-	    var rotation = hand1.roll();
+  	    var grabStrength = hand1.grabStrength;
+  	    var rotation = hand1.roll();
 
         var mappedHeight = Math.floor(map_range(actualHeight, 100, 400, 0, scaleArray.length));
         mappedHeight = constrain(mappedHeight, 0, scaleArray.length-1);
@@ -124,7 +137,7 @@ controller.on('connect', function() {
         	output.sendMessage([128,scaleArray[previousNoteSelection],100]);
         	console.log("new note:", scaleArray[mappedHeight]);
         	previousNoteSelection = mappedHeight;
-	    	output.sendMessage([144,scaleArray[mappedHeight],100]);
+	    	  output.sendMessage([144,scaleArray[mappedHeight],100]);
         }
 
 
@@ -137,9 +150,3 @@ controller.on('connect', function() {
 });
 
 controller.connect();
-
-// var interval = setInterval(function() {
-// 	console.log('sending MIDI output...');
-// 	output.sendMessage([144,60,127]);
-// }, 1000);
-
